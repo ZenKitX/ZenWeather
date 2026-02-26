@@ -117,3 +117,11 @@ app.*.symbols
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+
+# Reference projects (not part of this project)
+flutter_weather_app-getx/
+Weather-App-UI-Flutter-master/
+
+# IDE
+.idea/
+*.iml
