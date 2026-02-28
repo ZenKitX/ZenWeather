@@ -179,10 +179,10 @@ git push origin v1.0.0
 
 ```bash
 # 检查格式
-flutter format --set-exit-if-changed .
+dart format --set-exit-if-changed .
 
 # 自动格式化
-flutter format .
+dart format .
 ```
 
 ### 代码分析

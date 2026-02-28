@@ -34,8 +34,8 @@ jobs:
       
       - name: 代码格式检查
         run: |
-          flutter format --set-exit-if-changed . || \
-          (echo "❌ 代码格式不正确！请运行: flutter format ." && exit 1)
+          dart format --set-exit-if-changed . || \
+          (echo "❌ 代码格式不正确！请运行: dart format ." && exit 1)
       
       - name: 代码分析
         run: |
