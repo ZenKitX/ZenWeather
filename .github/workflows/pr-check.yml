@@ -1,0 +1,110 @@
+name: PR Check - Pull Request 检查
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-validation:
+    name: PR 验证
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 设置 Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: 获取依赖
+        run: flutter pub get
+      
+      - name: 检查提交信息格式
+        run: |
+          echo "检查提交信息是否符合 Conventional Commits 规范..."
+          git log --format=%s origin/${{ github.base_ref }}..${{ github.sha }} | \
+          grep -E '^(feat|fix|docs|style|refactor|perf|test|chore|assets)(\(.+\))?: .+' || \
+          (echo "❌ 提交信息不符合规范！请使用: type(scope): message" && exit 1)
+      
+      - name: 代码格式检查
+        run: |
+          flutter format --set-exit-if-changed . || \
+          (echo "❌ 代码格式不正确！请运行: flutter format ." && exit 1)
+      
+      - name: 代码分析
+        run: |
+          flutter analyze || \
+          (echo "❌ 代码分析失败！请修复所有错误" && exit 1)
+      
+      - name: 运行测试
+        run: |
+          flutter test || \
+          (echo "❌ 测试失败！请修复失败的测试" && exit 1)
+      
+      - name: 检查文件大小
+        run: |
+          echo "检查是否有大文件..."
+          find . -type f -size +5M -not -path "./.git/*" -not -path "./build/*" | \
+          while read file; do
+            echo "⚠️ 发现大文件: $file ($(du -h "$file" | cut -f1))"
+          done
+      
+      - name: PR 检查通过
+        run: |
+          echo "✅ 所有检查通过！"
+          echo "📝 PR 可以合并"
+
+  size-check:
+    name: 构建大小检查
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置 Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: 获取依赖
+        run: flutter pub get
+      
+      - name: 构建 APK
+        run: flutter build apk --release
+      
+      - name: 检查 APK 大小
+        run: |
+          APK_SIZE=$(du -h build/app/outputs/flutter-apk/app-release.apk | cut -f1)
+          echo "📦 APK 大小: $APK_SIZE"
+          
+          # 检查是否超过 50MB
+          APK_SIZE_MB=$(du -m build/app/outputs/flutter-apk/app-release.apk | cut -f1)
+          if [ $APK_SIZE_MB -gt 50 ]; then
+            echo "⚠️ APK 大小超过 50MB，请考虑优化"
+          else
+            echo "✅ APK 大小正常"
+          fi
+      
+      - name: 添加评论到 PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const apkSize = fs.statSync('build/app/outputs/flutter-apk/app-release.apk').size;
+            const apkSizeMB = (apkSize / 1024 / 1024).toFixed(2);
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 📊 构建大小报告\n\n- **APK 大小**: ${apkSizeMB} MB\n- **状态**: ${apkSizeMB > 50 ? '⚠️ 需要优化' : '✅ 正常'}`
+            });

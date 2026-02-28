@@ -1,0 +1,159 @@
+name: Release - 发布应用
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  create-release:
+    name: 创建 Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 创建 Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: 禅意天气 ${{ github.ref }}
+          body: |
+            ## 🎉 新版本发布
+            
+            ### ✨ 主要更新
+            - 请在此处添加更新内容
+            
+            ### 📦 下载
+            - Android APK
+            - iOS IPA (需要签名)
+            - Web 版本
+            
+            ### 📝 完整更新日志
+            查看 [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
+          draft: false
+          prerelease: false
+
+  build-android-release:
+    name: 构建 Android Release
+    runs-on: ubuntu-latest
+    needs: create-release
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置 Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - name: 设置 Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: 获取依赖
+        run: flutter pub get
+      
+      - name: 构建 APK
+        run: flutter build apk --release
+      
+      - name: 构建 App Bundle
+        run: flutter build appbundle --release
+      
+      - name: 上传 APK 到 Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: build/app/outputs/flutter-apk/app-release.apk
+          asset_name: zen-weather-${{ github.ref_name }}-android.apk
+          asset_content_type: application/vnd.android.package-archive
+      
+      - name: 上传 App Bundle 到 Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: build/app/outputs/bundle/release/app-release.aab
+          asset_name: zen-weather-${{ github.ref_name }}-android.aab
+          asset_content_type: application/octet-stream
+
+  build-ios-release:
+    name: 构建 iOS Release
+    runs-on: macos-latest
+    needs: create-release
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置 Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: 获取依赖
+        run: flutter pub get
+      
+      - name: 构建 iOS
+        run: flutter build ios --release --no-codesign
+      
+      - name: 创建 IPA
+        run: |
+          mkdir -p Payload
+          cp -r build/ios/iphoneos/Runner.app Payload/
+          zip -r zen-weather-${{ github.ref_name }}-ios.ipa Payload
+      
+      - name: 上传 IPA 到 Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: zen-weather-${{ github.ref_name }}-ios.ipa
+          asset_name: zen-weather-${{ github.ref_name }}-ios.ipa
+          asset_content_type: application/octet-stream
+
+  deploy-web:
+    name: 部署 Web 版本
+    runs-on: ubuntu-latest
+    needs: create-release
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置 Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: 获取依赖
+        run: flutter pub get
+      
+      - name: 构建 Web
+        run: flutter build web --release --base-href /zen-weather/
+      
+      - name: 部署到 GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
+          cname: zen-weather.example.com  # 可选：自定义域名
