@@ -6,7 +6,7 @@ import '../controllers/settings_controller.dart';
 
 /// 设置页面
 class SettingsView extends GetView<SettingsController> {
-  const SettingsView({Key? key}) : super(key: key);
+  const SettingsView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,24 +21,25 @@ class SettingsView extends GetView<SettingsController> {
           // 外观设置
           _buildSectionHeader('外观设置', theme),
           Obx(() => SwitchListTile(
-            title: const Text('深色模式'),
-            subtitle: const Text('切换浅色/深色主题'),
-            value: !controller.isLightTheme.value,
-            onChanged: (value) => controller.toggleTheme(),
-            activeColor: ZenColors.bambooGreen,
-          )),
+                title: const Text('深色模式'),
+                subtitle: const Text('切换浅色/深色主题'),
+                value: !controller.isLightTheme.value,
+                onChanged: (value) => controller.toggleTheme(),
+                activeThumbColor: ZenColors.bambooGreen,
+              )),
 
           const Divider(),
 
           // 单位设置
           _buildSectionHeader('单位设置', theme),
           Obx(() => SwitchListTile(
-            title: const Text('温度单位'),
-            subtitle: Text(controller.isCelsius.value ? '摄氏度 (℃)' : '华氏度 (℉)'),
-            value: controller.isCelsius.value,
-            onChanged: (value) => controller.toggleTemperatureUnit(),
-            activeColor: ZenColors.bambooGreen,
-          )),
+                title: const Text('温度单位'),
+                subtitle:
+                    Text(controller.isCelsius.value ? '摄氏度 (℃)' : '华氏度 (℉)'),
+                value: controller.isCelsius.value,
+                onChanged: (value) => controller.toggleTemperatureUnit(),
+                activeThumbColor: ZenColors.bambooGreen,
+              )),
 
           const Divider(),
 
@@ -47,8 +48,8 @@ class SettingsView extends GetView<SettingsController> {
           ListTile(
             title: const Text('语言'),
             subtitle: Obx(() => Text(
-              controller.languageCode.value == 'zh' ? '简体中文' : 'English',
-            )),
+                  controller.languageCode.value == 'zh' ? '简体中文' : 'English',
+                )),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showLanguageDialog(),
           ),
@@ -126,9 +127,7 @@ class SettingsView extends GetView<SettingsController> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            RadioListTile<String>(
-              title: const Text('简体中文'),
-              value: 'zh',
+            RadioGroup<String>(
               groupValue: controller.languageCode.value,
               onChanged: (value) {
                 if (value != null) {
@@ -136,19 +135,21 @@ class SettingsView extends GetView<SettingsController> {
                   Get.back();
                 }
               },
-              activeColor: ZenColors.bambooGreen,
-            ),
-            RadioListTile<String>(
-              title: const Text('English'),
-              value: 'en',
-              groupValue: controller.languageCode.value,
-              onChanged: (value) {
-                if (value != null) {
-                  controller.changeLanguage(value);
-                  Get.back();
-                }
-              },
-              activeColor: ZenColors.bambooGreen,
+              child: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RadioListTile<String>(
+                    title: Text('简体中文'),
+                    value: 'zh',
+                    activeColor: ZenColors.bambooGreen,
+                  ),
+                  RadioListTile<String>(
+                    title: Text('English'),
+                    value: 'en',
+                    activeColor: ZenColors.bambooGreen,
+                  ),
+                ],
+              ),
             ),
           ],
         ),

@@ -8,11 +8,11 @@ class WeatherAnimation extends StatefulWidget {
   final double height;
 
   const WeatherAnimation({
-    Key? key,
+    super.key,
     required this.weatherType,
     this.width = double.infinity,
     this.height = 300,
-  }) : super(key: key);
+  });
 
   @override
   State<WeatherAnimation> createState() => _WeatherAnimationState();
@@ -137,7 +137,7 @@ class RainPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.blue.withOpacity(0.3)
+      ..color = Colors.blue.withValues(alpha: 0.3)
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
 
@@ -170,12 +170,13 @@ class SnowPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.8)
+      ..color = Colors.white.withValues(alpha: 0.8)
       ..style = PaintingStyle.fill;
 
     // 绘制15个雪花
     for (int i = 0; i < 15; i++) {
-      final x = (random.nextDouble() * size.width + animation * 50) % size.width;
+      final x =
+          (random.nextDouble() * size.width + animation * 50) % size.width;
       final baseY = random.nextDouble() * size.height;
       final y = (baseY + animation * size.height * 0.5) % size.height;
       final radius = 3.0 + random.nextDouble() * 3;
@@ -197,12 +198,13 @@ class CloudPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.grey.withOpacity(0.2)
+      ..color = Colors.grey.withValues(alpha: 0.2)
       ..style = PaintingStyle.fill;
 
     // 绘制3朵云
     for (int i = 0; i < 3; i++) {
-      final x = (size.width * 0.2 * i + animation * size.width * 0.3) % size.width;
+      final x =
+          (size.width * 0.2 * i + animation * size.width * 0.3) % size.width;
       final y = size.height * 0.2 + i * 30.0;
 
       _drawCloud(canvas, Offset(x, y), paint);
@@ -229,25 +231,25 @@ class SunnyPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width * 0.5, size.height * 0.3);
-    final radius = 40.0;
+    const radius = 40.0;
 
     // 太阳光晕
     final glowPaint = Paint()
-      ..color = Colors.orange.withOpacity(0.1)
+      ..color = Colors.orange.withValues(alpha: 0.1)
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(center, radius + 20, glowPaint);
 
     // 太阳本体
     final sunPaint = Paint()
-      ..color = Colors.orange.withOpacity(0.6)
+      ..color = Colors.orange.withValues(alpha: 0.6)
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(center, radius, sunPaint);
 
     // 太阳光线
     final rayPaint = Paint()
-      ..color = Colors.orange.withOpacity(0.4)
+      ..color = Colors.orange.withValues(alpha: 0.4)
       ..strokeWidth = 3
       ..strokeCap = StrokeCap.round;
 

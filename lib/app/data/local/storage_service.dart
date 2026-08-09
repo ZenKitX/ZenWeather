@@ -10,7 +10,7 @@ class StorageService {
   }
 
   // ==================== 主题相关 ====================
-  
+
   /// 保存主题模式
   static Future<bool> setThemeMode(bool isLight) async {
     return await _prefs.setBool(_StorageKeys.themeMode, isLight);
@@ -22,7 +22,7 @@ class StorageService {
   }
 
   // ==================== 语言相关 ====================
-  
+
   /// 保存语言代码
   static Future<bool> setLanguageCode(String languageCode) async {
     return await _prefs.setString(_StorageKeys.languageCode, languageCode);
@@ -34,7 +34,7 @@ class StorageService {
   }
 
   // ==================== 位置相关 ====================
-  
+
   /// 保存最后的位置
   static Future<bool> setLastLocation(double lat, double lon) async {
     await _prefs.setDouble(_StorageKeys.lastLatitude, lat);
@@ -52,7 +52,7 @@ class StorageService {
   }
 
   // ==================== 城市相关 ====================
-  
+
   /// 保存收藏的城市列表
   static Future<bool> setFavoriteCities(List<String> cities) async {
     return await _prefs.setStringList(_StorageKeys.favoriteCities, cities);
@@ -63,8 +63,27 @@ class StorageService {
     return _prefs.getStringList(_StorageKeys.favoriteCities) ?? [];
   }
 
+  /// 添加收藏城市
+  static Future<bool> addFavoriteCity(String cityName) async {
+    final cities = getFavoriteCities();
+    if (!cities.contains(cityName)) {
+      cities.add(cityName);
+      return setFavoriteCities(cities);
+    }
+    return true;
+  }
+
+  /// 移除收藏城市
+  static Future<bool> removeFavoriteCity(String cityName) async {
+    final cities = getFavoriteCities();
+    if (cities.remove(cityName)) {
+      return setFavoriteCities(cities);
+    }
+    return true;
+  }
+
   // ==================== 首次启动 ====================
-  
+
   /// 设置首次启动标记
   static Future<bool> setFirstLaunch(bool isFirst) async {
     return await _prefs.setBool(_StorageKeys.firstLaunch, isFirst);
@@ -76,7 +95,7 @@ class StorageService {
   }
 
   // ==================== 清除数据 ====================
-  
+
   /// 清除所有数据
   static Future<bool> clearAll() async {
     return await _prefs.clear();

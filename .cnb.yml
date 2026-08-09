@@ -1,0 +1,123 @@
+# ZenWeather CNB 流水线配置
+# - push: 同步到 GitHub 镜像 + CI（analyze / test）
+# - tag_push: 构建 release APK / AAB / Web / Linux 并发布 Release
+# - issue/PR 自动指派
+
+# Flutter CI 公共模板（YAML 锚点，供 push 与 pull_request 复用，避免重复）
+.x-flutter-ci: &flutter-ci
+  name: ci
+  docker:
+    image: ghcr.io/cirruslabs/flutter:stable
+  stages:
+    - name: install dependencies
+      script: flutter pub get
+    - name: analyze
+      script: flutter analyze
+    - name: test
+      script: flutter test
+
+main:
+  push:
+    # 同步到 GitHub 镜像（依赖 h1s97x/secret-env 仓库中的 GITHUB_USERNAME/GITHUB_TOKEN）
+    - imports: https://cnb.cool/h1s97x/secret-env/-/blob/main/env.yml
+      name: sync to github
+      stages:
+        - name: sync to github
+          image: tencentcom/git-sync
+          settings:
+            target_url: https://github.com/ZenKitX/ZenWeather
+            auth_type: https
+            username: $GITHUB_USERNAME
+            password: $GITHUB_TOKEN
+            branch: main
+
+    # CI：静态分析 + 单元测试
+    - *flutter-ci
+
+"$":
+  issue.open:
+    - stages:
+        - name: auto assign issue to h1s97x
+          type: git:issue-update
+          options:
+            assignee:
+              add: h1s97x
+  issue.reopen:
+    - stages:
+        - name: auto assign issue to h1s97x
+          type: git:issue-update
+          options:
+            assignee:
+              add: h1s97x
+
+  # 打 tag 时构建多平台 Release 产物并发布 Release
+  tag_push:
+    - name: release multi-platform
+      docker:
+        # 使用预装 GTK 等依赖的镜像（见 .ci/Dockerfile），避免每次构建重复 apt-get
+        build:
+          dockerfile: .ci/Dockerfile
+          by: [.ci/Dockerfile]
+      imports:
+        - https://cnb.cool/h1s97x/secret-env/-/blob/main/env.yml
+      stages:
+        - name: install dependencies
+          script: flutter pub get
+
+        # 签名密钥注入（KEYSTORE_BASE64 存在时执行；未配置则跳过，使用 debug 签名）
+        - name: setup keystore
+          if: '[ -n "$KEYSTORE_BASE64" ]'
+          script: |
+            echo "$KEYSTORE_BASE64" | base64 -d > android/app/keystore.jks
+            echo "storePassword=$KEYSTORE_PASSWORD" > android/key.properties
+            echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
+            echo "keyAlias=$KEY_ALIAS" >> android/key.properties
+            echo "storeFile=keystore.jks" >> android/key.properties
+
+        # Android APK
+        - name: build apk
+          script: flutter build apk --release
+
+        # Android App Bundle（上架 Google Play 用）
+        - name: build appbundle
+          script: flutter build appbundle --release
+
+        # Web 产物
+        - name: build web
+          script: |
+            flutter build web --release
+            cd build/web && zip -r ../web-$CNB_BRANCH.zip . && cd ../..
+
+        # Linux 桌面产物（依赖已在 .ci/Dockerfile 中预装）
+        - name: build linux
+          script: |
+            flutter build linux --release
+            cd build/linux/x64/release && tar -czf ../../../zenweather-linux-x64-$CNB_BRANCH.tar.gz bundle && cd ../../../..
+
+        # 创建 Release（tag 缺省取 $CNB_BRANCH，description 自动从 CHANGELOG.md 读取）
+        - name: create release
+          type: git:release
+          options:
+            descriptionFromFile: CHANGELOG.md
+
+        # 将多平台产物作为附件上传到 Release
+        - name: upload artifacts
+          image: cnbcool/attachments:latest
+          settings:
+            attachments:
+              - "./build/app/outputs/flutter-apk/app-release.apk"
+              - "./build/app/outputs/bundle/release/app-release.aab"
+              - "./build/web-$CNB_BRANCH.zip"
+              - "./build/zenweather-linux-x64-$CNB_BRANCH.tar.gz"
+
+"**":
+  pull_request:
+    - stages:
+        - name: auto assign pr to h1s97x
+          type: git:reviewer
+          options:
+            type: add-assignee
+            reviewers: h1s97x
+
+    # PR CI：静态分析 + 单元测试（复用 Flutter CI 模板）
+    - *flutter-ci

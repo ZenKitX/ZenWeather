@@ -16,8 +16,8 @@ class ZenTheme {
       brightness: Brightness.light,
       primaryColor: ZenColors.bambooGreen,
       scaffoldBackgroundColor: ZenColors.paperWhite,
-      
-      colorScheme: ColorScheme.light(
+
+      colorScheme: const ColorScheme.light(
         primary: ZenColors.bambooGreen,
         secondary: ZenColors.plumBlossom,
         surface: ZenColors.pureWhite,
@@ -27,7 +27,7 @@ class ZenTheme {
         onSurface: ZenColors.inkBlack,
         onError: ZenColors.pureWhite,
       ),
-      
+
       // 文字主题
       textTheme: TextTheme(
         displayLarge: GoogleFonts.notoSerif(
@@ -62,19 +62,19 @@ class ZenTheme {
           color: ZenColors.inkBlack,
         ),
       ),
-      
+
       // 应用栏主题
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(color: ZenColors.inkBlack),
+        iconTheme: const IconThemeData(color: ZenColors.inkBlack),
         titleTextStyle: GoogleFonts.notoSerif(
           fontSize: 20,
           fontWeight: FontWeight.w500,
           color: ZenColors.inkBlack,
         ),
       ),
-      
+
       // 卡片主题
       cardTheme: const CardThemeData(
         color: ZenColors.pureWhite,
@@ -83,15 +83,15 @@ class ZenTheme {
           borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
       ),
-      
+
       // 图标主题
-      iconTheme: IconThemeData(
+      iconTheme: const IconThemeData(
         color: ZenColors.inkBlack,
         size: 24,
       ),
-      
+
       // 分割线主题
-      dividerTheme: DividerThemeData(
+      dividerTheme: const DividerThemeData(
         color: ZenColors.mistGray,
         thickness: 1,
       ),
@@ -105,8 +105,8 @@ class ZenTheme {
       brightness: Brightness.dark,
       primaryColor: ZenColors.lightBamboo,
       scaffoldBackgroundColor: ZenColors.deepInk,
-      
-      colorScheme: ColorScheme.dark(
+
+      colorScheme: const ColorScheme.dark(
         primary: ZenColors.lightBamboo,
         secondary: ZenColors.lightPlum,
         surface: ZenColors.inkBlack,
@@ -116,7 +116,7 @@ class ZenTheme {
         onSurface: ZenColors.paperWhite,
         onError: ZenColors.pureWhite,
       ),
-      
+
       // 文字主题
       textTheme: TextTheme(
         displayLarge: GoogleFonts.notoSerif(
@@ -151,19 +151,19 @@ class ZenTheme {
           color: ZenColors.paperWhite,
         ),
       ),
-      
+
       // 应用栏主题
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(color: ZenColors.paperWhite),
+        iconTheme: const IconThemeData(color: ZenColors.paperWhite),
         titleTextStyle: GoogleFonts.notoSerif(
           fontSize: 20,
           fontWeight: FontWeight.w500,
           color: ZenColors.paperWhite,
         ),
       ),
-      
+
       // 卡片主题
       cardTheme: const CardThemeData(
         color: ZenColors.inkBlack,
@@ -172,15 +172,15 @@ class ZenTheme {
           borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
       ),
-      
+
       // 图标主题
-      iconTheme: IconThemeData(
+      iconTheme: const IconThemeData(
         color: ZenColors.paperWhite,
         size: 24,
       ),
-      
+
       // 分割线主题
-      dividerTheme: DividerThemeData(
+      dividerTheme: const DividerThemeData(
         color: ZenColors.darkMist,
         thickness: 1,
       ),

@@ -22,12 +22,12 @@ class SeasonalThemes {
   /// 春季配色
   static final SeasonalColors _springColors = SeasonalColors(
     primary: ZenColors.bambooGreen,
-    secondary: Color(0xFFB8E6B8), // 嫩绿
-    accent: Color(0xFFFFB6C1), // 樱粉
-    background: Color(0xFFF0F8F0), // 春白
-    cardBackground: Color(0xFFFFFFFF),
+    secondary: const Color(0xFFB8E6B8), // 嫩绿
+    accent: const Color(0xFFFFB6C1), // 樱粉
+    background: const Color(0xFFF0F8F0), // 春白
+    cardBackground: const Color(0xFFFFFFFF),
     textPrimary: ZenColors.inkBlack,
-    textSecondary: Color(0xFF5A7A5A),
+    textSecondary: const Color(0xFF5A7A5A),
     seasonName: '春',
     seasonDescription: '春风拂面，万物复苏',
   );
@@ -35,12 +35,12 @@ class SeasonalThemes {
   /// 夏季配色
   static final SeasonalColors _summerColors = SeasonalColors(
     primary: ZenColors.skyBlue,
-    secondary: Color(0xFF87CEEB), // 天蓝
-    accent: Color(0xFFFFD700), // 金黄
-    background: Color(0xFFF0F8FF), // 夏白
-    cardBackground: Color(0xFFFFFFFF),
+    secondary: const Color(0xFF87CEEB), // 天蓝
+    accent: const Color(0xFFFFD700), // 金黄
+    background: const Color(0xFFF0F8FF), // 夏白
+    cardBackground: const Color(0xFFFFFFFF),
     textPrimary: ZenColors.inkBlack,
-    textSecondary: Color(0xFF4682B4),
+    textSecondary: const Color(0xFF4682B4),
     seasonName: '夏',
     seasonDescription: '绿树成荫，蝉鸣阵阵',
   );
@@ -48,25 +48,25 @@ class SeasonalThemes {
   /// 秋季配色
   static final SeasonalColors _autumnColors = SeasonalColors(
     primary: ZenColors.sunsetOrange,
-    secondary: Color(0xFFDEB887), // 枫黄
-    accent: Color(0xFFCD853F), // 秋褐
-    background: Color(0xFFFFF8F0), // 秋白
-    cardBackground: Color(0xFFFFFFFF),
+    secondary: const Color(0xFFDEB887), // 枫黄
+    accent: const Color(0xFFCD853F), // 秋褐
+    background: const Color(0xFFFFF8F0), // 秋白
+    cardBackground: const Color(0xFFFFFFFF),
     textPrimary: ZenColors.inkBlack,
-    textSecondary: Color(0xFF8B4513),
+    textSecondary: const Color(0xFF8B4513),
     seasonName: '秋',
     seasonDescription: '秋高气爽，层林尽染',
   );
 
   /// 冬季配色
   static final SeasonalColors _winterColors = SeasonalColors(
-    primary: Color(0xFFB0C4DE), // 冬蓝
-    secondary: Color(0xFFE0E0E0), // 雪白
-    accent: Color(0xFF708090), // 冬灰
-    background: Color(0xFFF5F5F5), // 冬白
-    cardBackground: Color(0xFFFFFFFF),
+    primary: const Color(0xFFB0C4DE), // 冬蓝
+    secondary: const Color(0xFFE0E0E0), // 雪白
+    accent: const Color(0xFF708090), // 冬灰
+    background: const Color(0xFFF5F5F5), // 冬白
+    cardBackground: const Color(0xFFFFFFFF),
     textPrimary: ZenColors.inkBlack,
-    textSecondary: Color(0xFF696969),
+    textSecondary: const Color(0xFF696969),
     seasonName: '冬',
     seasonDescription: '银装素裹，静谧安宁',
   );
@@ -79,7 +79,7 @@ class SeasonalThemes {
       end: Alignment.bottomCenter,
       colors: [
         colors.background,
-        colors.background.withOpacity(0.8),
+        colors.background.withValues(alpha: 0.8),
       ],
     );
   }

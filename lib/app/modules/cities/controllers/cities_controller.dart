@@ -5,7 +5,8 @@ import '../../../data/models/city_model.dart';
 
 /// 城市管理控制器 - 重构版
 class CitiesController extends GetxController {
-  final weather_kit.WeatherService _weatherService = weather_kit.WeatherService(
+  final weather_kit.WeatherService _weatherService =
+      weather_kit.WeatherService.withWeatherAPI(
     apiKey: const String.fromEnvironment('WEATHER_API_KEY', defaultValue: ''),
   );
 
@@ -38,20 +39,11 @@ class CitiesController extends GetxController {
       // 为每个城市获取天气数据
       final List<CityModel> loadedCities = [];
       for (final cityName in cityNames) {
-        final result = await _weatherService.getWeatherByCity(city: city);
+        final result = await _weatherService.getWeatherByCity(city: cityName);
 
         result.fold(
           (weather) {
-            loadedCities.add(CityModel(
-              name: weather.location.name,
-              region: weather.location.region,
-              country: weather.location.country,
-              lat: weather.location.lat,
-              lon: weather.location.lon,
-              currentTemp: '${weather.current.tempC.round()}°',
-              weatherCondition: weather.current.conditionText,
-              weatherIcon: weather.current.conditionText,
-            ));
+            loadedCities.add(_fromWeather(weather));
           },
           (error) {
             // 跳过失败的城市
@@ -79,15 +71,7 @@ class CitiesController extends GetxController {
 
       result.fold(
         (weather) {
-          searchResults.value = [
-            CityModel(
-              name: weather.location.name,
-              region: weather.location.region,
-              country: weather.location.country,
-              lat: weather.location.lat,
-              lon: weather.location.lon,
-            ),
-          ];
+          searchResults.value = [_fromWeather(weather)];
         },
         (error) {
           searchResults.clear();
@@ -111,12 +95,7 @@ class CitiesController extends GetxController {
 
     result.fold(
       (weather) {
-        final cityWithWeather = city.copyWithWeather(
-          currentTemp: '${weather.current.tempC.round()}°',
-          weatherCondition: weather.current.conditionText,
-          weatherIcon: weather.current.conditionText,
-        );
-
+        final cityWithWeather = _fromWeather(weather);
         cities.add(cityWithWeather);
         StorageService.addFavoriteCity(city.name);
         Get.snackbar('成功', '已添加 ${city.name}');
@@ -139,10 +118,77 @@ class CitiesController extends GetxController {
     await _loadCities();
   }
 
+  /// 切换当前城市
+  void switchToCity(CityModel city) {
+    currentCityName.value = city.name;
+  }
+
   /// 选择城市
   void selectCity(CityModel city) {
     currentCityName.value = city.name;
     // 导航到天气详情页
-    Get.toNamed('/weather-detail', arguments: city);
+    Get.toNamed('/weather-detail', arguments: city.name);
+  }
+
+  /// 从 WeatherKit 数据构造城市模型
+  CityModel _fromWeather(weather_kit.Weather weather) {
+    return CityModel(
+      name: weather.city.name,
+      region: weather.city.region,
+      country: weather.city.country,
+      lat: weather.city.latitude,
+      lon: weather.city.longitude,
+      currentTemp: '${weather.currentTemperature.round()}°',
+      weatherCondition: _conditionText(weather.condition),
+      weatherIcon: _conditionIcon(weather.condition),
+    );
+  }
+
+  /// 天气状况文本
+  String _conditionText(weather_kit.WeatherCondition condition) {
+    switch (condition) {
+      case weather_kit.WeatherCondition.clear:
+        return '晴';
+      case weather_kit.WeatherCondition.partlyCloudy:
+        return '多云';
+      case weather_kit.WeatherCondition.cloudy:
+        return '阴';
+      case weather_kit.WeatherCondition.rain:
+        return '雨';
+      case weather_kit.WeatherCondition.snow:
+        return '雪';
+      case weather_kit.WeatherCondition.thunderstorm:
+        return '雷雨';
+      case weather_kit.WeatherCondition.fog:
+        return '雾';
+      case weather_kit.WeatherCondition.mist:
+        return '薄雾';
+      case weather_kit.WeatherCondition.unknown:
+        return '未知';
+    }
+  }
+
+  /// 天气图标
+  String _conditionIcon(weather_kit.WeatherCondition condition) {
+    switch (condition) {
+      case weather_kit.WeatherCondition.clear:
+        return '//cdn.weatherapi.com/weather/64x64/day/113.png';
+      case weather_kit.WeatherCondition.partlyCloudy:
+        return '//cdn.weatherapi.com/weather/64x64/day/116.png';
+      case weather_kit.WeatherCondition.cloudy:
+        return '//cdn.weatherapi.com/weather/64x64/day/119.png';
+      case weather_kit.WeatherCondition.rain:
+        return '//cdn.weatherapi.com/weather/64x64/day/302.png';
+      case weather_kit.WeatherCondition.snow:
+        return '//cdn.weatherapi.com/weather/64x64/day/326.png';
+      case weather_kit.WeatherCondition.thunderstorm:
+        return '//cdn.weatherapi.com/weather/64x64/day/200.png';
+      case weather_kit.WeatherCondition.fog:
+        return '//cdn.weatherapi.com/weather/64x64/day/248.png';
+      case weather_kit.WeatherCondition.mist:
+        return '//cdn.weatherapi.com/weather/64x64/day/143.png';
+      case weather_kit.WeatherCondition.unknown:
+        return '//cdn.weatherapi.com/weather/64x64/day/113.png';
+    }
   }
 }

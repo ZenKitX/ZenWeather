@@ -25,7 +25,7 @@ void main() async {
 }
 
 class ZenWeatherApp extends StatelessWidget {
-  const ZenWeatherApp({Key? key}) : super(key: key);
+  const ZenWeatherApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,16 +40,16 @@ class ZenWeatherApp extends StatelessWidget {
         return GetMaterialApp(
           title: '禅意天气',
           debugShowCheckedModeBanner: false,
-          
+
           // 主题配置
           theme: ZenTheme.getThemeData(isLight: true),
           darkTheme: ZenTheme.getThemeData(isLight: false),
           themeMode: isLightTheme ? ThemeMode.light : ThemeMode.dark,
-          
+
           // 路由配置
           initialRoute: AppPages.initial,
           getPages: AppPages.routes,
-          
+
           // 默认过渡动画
           defaultTransition: Transition.fadeIn,
           transitionDuration: const Duration(milliseconds: 300),

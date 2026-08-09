@@ -22,7 +22,7 @@ dependencies:
   solar_term_kit:
     git:
       url: https://github.com/ZenKitX/SolarTermKit.git
-      ref: main
+      ref: ba65cf85fa35d098cc572dae688dc3d527eddfae
   location_kit:
     git:
       url: https://github.com/ZenKitX/LocationKit.git

@@ -9,7 +9,7 @@ import 'city_search_view.dart';
 
 /// 城市管理页面
 class CitiesView extends GetView<CitiesController> {
-  const CitiesView({Key? key}) : super(key: key);
+  const CitiesView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -134,9 +134,9 @@ class CitiesView extends GetView<CitiesController> {
           TextButton(
             onPressed: () {
               Get.back();
-              controller.removeCity(index);
+              controller.removeCity(controller.cities[index]);
             },
-            child: Text(
+            child: const Text(
               '删除',
               style: TextStyle(color: ZenColors.error),
             ),

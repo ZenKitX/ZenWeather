@@ -7,10 +7,10 @@ import '../../../../config/theme/zen_theme.dart';
 class SettingsController extends GetxController {
   // 主题模式
   final RxBool isLightTheme = true.obs;
-  
+
   // 温度单位 (true: 摄氏度, false: 华氏度)
   final RxBool isCelsius = true.obs;
-  
+
   // 语言
   final RxString languageCode = 'zh'.obs;
 
@@ -33,7 +33,7 @@ class SettingsController extends GetxController {
     isLightTheme.value = !isLightTheme.value;
     StorageService.setThemeMode(isLightTheme.value);
     Get.changeTheme(
-      isLightTheme.value 
+      isLightTheme.value
           ? ZenTheme.getThemeData(isLight: true)
           : ZenTheme.getThemeData(isLight: false),
     );
@@ -69,7 +69,7 @@ class SettingsController extends GetxController {
 
 /// 关于对话框
 class AboutDialog extends StatelessWidget {
-  const AboutDialog({Key? key}) : super(key: key);
+  const AboutDialog({super.key});
 
   @override
   Widget build(BuildContext context) {

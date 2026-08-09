@@ -8,9 +8,9 @@ class LoadingWidget extends StatelessWidget {
   final String? message;
 
   const LoadingWidget({
-    Key? key,
+    super.key,
     this.message,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +24,14 @@ class LoadingWidget extends StatelessWidget {
           SizedBox(
             width: 60.w,
             height: 60.h,
-            child: CircularProgressIndicator(
+            child: const CircularProgressIndicator(
               strokeWidth: 3,
               valueColor: AlwaysStoppedAnimation<Color>(
                 ZenColors.bambooGreen,
               ),
             ),
           ),
-          
+
           if (message != null) ...[
             SizedBox(height: 24.h),
             Text(
@@ -47,7 +47,7 @@ class LoadingWidget extends StatelessWidget {
 
 /// 骨架屏加载组件
 class ShimmerLoading extends StatelessWidget {
-  const ShimmerLoading({Key? key}) : super(key: key);
+  const ShimmerLoading({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -84,9 +84,9 @@ class ShimmerLoading extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             SizedBox(height: 60.h),
-            
+
             // 温度
             Center(
               child: Container(
@@ -98,9 +98,9 @@ class ShimmerLoading extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             SizedBox(height: 16.h),
-            
+
             // 天气描述
             Center(
               child: Container(
@@ -112,9 +112,9 @@ class ShimmerLoading extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             SizedBox(height: 60.h),
-            
+
             // 诗词卡片
             Container(
               width: double.infinity,
@@ -124,9 +124,9 @@ class ShimmerLoading extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20.r),
               ),
             ),
-            
+
             SizedBox(height: 40.h),
-            
+
             // 天气详情卡片
             Container(
               width: double.infinity,

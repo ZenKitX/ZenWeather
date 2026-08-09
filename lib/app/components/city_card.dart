@@ -11,11 +11,11 @@ class CityCard extends StatelessWidget {
   final VoidCallback? onDelete;
 
   const CityCard({
-    Key? key,
+    super.key,
     required this.city,
     this.onTap,
     this.onDelete,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class CityCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -138,10 +138,10 @@ class SearchCityCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const SearchCityCard({
-    Key? key,
+    super.key,
     required this.city,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -8,10 +8,10 @@ class ErrorDisplayWidget extends StatelessWidget {
   final VoidCallback? onRetry;
 
   const ErrorDisplayWidget({
-    Key? key,
+    super.key,
     required this.message,
     this.onRetry,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,19 +29,19 @@ class ErrorDisplayWidget extends StatelessWidget {
               size: 80.sp,
               color: ZenColors.darkMist,
             ),
-            
+
             SizedBox(height: 24.h),
-            
+
             // 错误信息
             Text(
               message,
               style: theme.textTheme.bodyLarge,
               textAlign: TextAlign.center,
             ),
-            
+
             if (onRetry != null) ...[
               SizedBox(height: 32.h),
-              
+
               // 重试按钮
               ElevatedButton.icon(
                 onPressed: onRetry,
@@ -73,10 +73,10 @@ class EmptyWidget extends StatelessWidget {
   final IconData? icon;
 
   const EmptyWidget({
-    Key? key,
+    super.key,
     required this.message,
     this.icon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -93,9 +93,7 @@ class EmptyWidget extends StatelessWidget {
               size: 80.sp,
               color: ZenColors.darkMist,
             ),
-            
             SizedBox(height: 24.h),
-            
             Text(
               message,
               style: theme.textTheme.bodyLarge,

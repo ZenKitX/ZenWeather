@@ -10,10 +10,10 @@ class PoemCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const PoemCard({
-    Key? key,
+    super.key,
     required this.poem,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,16 +30,16 @@ class PoemCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
           // 水墨边框效果
           border: Border.all(
-            color: isDark 
-                ? ZenColors.darkMist.withOpacity(0.3)
-                : ZenColors.mistGray.withOpacity(0.3),
+            color: isDark
+                ? ZenColors.darkMist.withValues(alpha: 0.3)
+                : ZenColors.mistGray.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -49,15 +49,17 @@ class PoemCard extends StatelessWidget {
             Icon(
               Icons.format_quote,
               size: 32.sp,
-              color: ZenColors.bambooGreen.withOpacity(0.5),
+              color: ZenColors.bambooGreen.withValues(alpha: 0.5),
             )
                 .animate(onPlay: (controller) => controller.repeat())
                 .fadeIn(duration: 1000.ms)
                 .then()
-                .shimmer(duration: 2000.ms, color: ZenColors.bambooGreen.withOpacity(0.3)),
-            
+                .shimmer(
+                    duration: 2000.ms,
+                    color: ZenColors.bambooGreen.withValues(alpha: 0.3)),
+
             SizedBox(height: 16.h),
-            
+
             // 诗词内容
             Text(
               poem.content,
@@ -69,9 +71,9 @@ class PoemCard extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            
+
             SizedBox(height: 20.h),
-            
+
             // 分隔线
             Container(
               width: 60.w,
@@ -80,15 +82,15 @@ class PoemCard extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     Colors.transparent,
-                    ZenColors.bambooGreen.withOpacity(0.5),
+                    ZenColors.bambooGreen.withValues(alpha: 0.5),
                     Colors.transparent,
                   ],
                 ),
               ),
             ),
-            
+
             SizedBox(height: 12.h),
-            
+
             // 作者信息
             Text(
               poem.fullInfo,
@@ -111,11 +113,11 @@ class SolarTermPoemCard extends StatelessWidget {
   final String description;
 
   const SolarTermPoemCard({
-    Key? key,
+    super.key,
     required this.solarTerm,
     required this.poem,
     required this.description,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -129,13 +131,13 @@ class SolarTermPoemCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            ZenColors.bambooGreen.withOpacity(0.1),
-            ZenColors.plumBlossom.withOpacity(0.1),
+            ZenColors.bambooGreen.withValues(alpha: 0.1),
+            ZenColors.plumBlossom.withValues(alpha: 0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-          color: ZenColors.bambooGreen.withOpacity(0.3),
+          color: ZenColors.bambooGreen.withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -164,10 +166,13 @@ class SolarTermPoemCard extends StatelessWidget {
               .animate(onPlay: (controller) => controller.repeat(reverse: true))
               .fadeIn(duration: 1000.ms)
               .then()
-              .scale(duration: 1500.ms, begin: const Offset(1.0, 1.0), end: const Offset(1.05, 1.05)),
-          
+              .scale(
+                  duration: 1500.ms,
+                  begin: const Offset(1.0, 1.0),
+                  end: const Offset(1.05, 1.05)),
+
           SizedBox(height: 12.h),
-          
+
           // 节气描述
           Text(
             description,
@@ -176,9 +181,9 @@ class SolarTermPoemCard extends StatelessWidget {
               letterSpacing: 1,
             ),
           ),
-          
+
           SizedBox(height: 20.h),
-          
+
           // 诗词内容
           Container(
             padding: EdgeInsets.all(16.w),
@@ -219,10 +224,10 @@ class MinimalPoemCard extends StatelessWidget {
   final String? author;
 
   const MinimalPoemCard({
-    Key? key,
+    super.key,
     required this.content,
     this.author,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

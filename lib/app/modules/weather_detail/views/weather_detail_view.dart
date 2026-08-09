@@ -9,17 +9,17 @@ import '../controllers/weather_detail_controller.dart';
 
 /// 天气详情视图
 class WeatherDetailView extends GetView<WeatherDetailController> {
-  const WeatherDetailView({Key? key}) : super(key: key);
+  const WeatherDetailView({super.key});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Obx(() => Text(
-          controller.weather.value?.location.name ?? '天气详情',
-        )),
+              controller.weather.value?.location.name ?? '天气详情',
+            )),
         centerTitle: true,
       ),
       body: Obx(() {
@@ -27,7 +27,7 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
         if (controller.isLoading.value) {
           return const ShimmerLoading();
         }
-        
+
         // 错误状态
         if (controller.errorMessage.value.isNotEmpty) {
           return ErrorDisplayWidget(
@@ -35,14 +35,14 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
             onRetry: controller.refreshWeather,
           );
         }
-        
+
         // 无数据
         if (controller.weather.value == null) {
           return const Center(child: Text('暂无数据'));
         }
-        
+
         final weather = controller.weather.value!;
-        
+
         return RefreshIndicator(
           onRefresh: controller.refreshWeather,
           child: SingleChildScrollView(
@@ -56,35 +56,35 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
                     .animate()
                     .fadeIn(duration: 400.ms)
                     .slideY(begin: 0.2, end: 0),
-                
+
                 SizedBox(height: 24.h),
-                
+
                 // 24小时预报
                 _buildSectionTitle(theme, '24小时预报')
                     .animate()
                     .fadeIn(delay: 100.ms, duration: 400.ms),
-                
+
                 SizedBox(height: 12.h),
-                
+
                 _buildHourlyForecast(theme, weather)
                     .animate()
                     .fadeIn(delay: 200.ms, duration: 400.ms)
                     .slideX(begin: 0.1, end: 0),
-                
+
                 SizedBox(height: 24.h),
-                
+
                 // 7天预报
                 _buildSectionTitle(theme, '7天预报')
                     .animate()
                     .fadeIn(delay: 300.ms, duration: 400.ms),
-                
+
                 SizedBox(height: 12.h),
-                
+
                 _buildDailyForecast(theme, weather)
                     .animate()
                     .fadeIn(delay: 400.ms, duration: 400.ms)
                     .slideY(begin: 0.2, end: 0),
-                
+
                 SizedBox(height: 20.h),
               ],
             ),
@@ -104,13 +104,13 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            ZenColors.bambooGreen.withOpacity(0.1),
-            ZenColors.skyBlue.withOpacity(0.1),
+            ZenColors.bambooGreen.withValues(alpha: 0.1),
+            ZenColors.skyBlue.withValues(alpha: 0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-          color: ZenColors.bambooGreen.withOpacity(0.3),
+          color: ZenColors.bambooGreen.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -124,17 +124,17 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
               fontWeight: FontWeight.w300,
             ),
           ),
-          
+
           SizedBox(height: 8.h),
-          
+
           // 天气状况
           Text(
             weather.current.conditionText,
             style: theme.textTheme.displaySmall,
           ),
-          
+
           SizedBox(height: 4.h),
-          
+
           // 体感温度
           Text(
             '体感 ${weather.current.feelslikeC.round()}°',
@@ -142,9 +142,9 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
               color: theme.textTheme.bodySmall?.color,
             ),
           ),
-          
+
           SizedBox(height: 24.h),
-          
+
           // 详细信息网格
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -215,7 +215,7 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
     if (weather.hourly.isEmpty) {
       return const Center(child: Text('暂无小时预报'));
     }
-    
+
     return SizedBox(
       height: 140.h,
       child: ListView.builder(
@@ -239,7 +239,7 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
         color: theme.cardTheme.color,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: ZenColors.bambooGreen.withOpacity(0.1),
+          color: ZenColors.bambooGreen.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -251,9 +251,9 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
             hourly.time.split(' ')[1],
             style: theme.textTheme.bodySmall,
           ),
-          
+
           SizedBox(height: 8.h),
-          
+
           // 天气图标
           Image.network(
             'https:${hourly.icon}',
@@ -267,9 +267,9 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
               );
             },
           ),
-          
+
           SizedBox(height: 8.h),
-          
+
           // 温度
           Text(
             '${hourly.tempC.round()}°',
@@ -287,7 +287,7 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
     if (weather.daily.isEmpty) {
       return const Center(child: Text('暂无每日预报'));
     }
-    
+
     return Column(
       children: weather.daily.map((day) {
         return _buildDailyItem(theme, day);
@@ -304,7 +304,7 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
         color: theme.cardTheme.color,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: ZenColors.bambooGreen.withOpacity(0.1),
+          color: ZenColors.bambooGreen.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -330,7 +330,7 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
               ],
             ),
           ),
-          
+
           // 天气图标
           Image.network(
             'https:${daily.icon}',
@@ -344,9 +344,9 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
               );
             },
           ),
-          
+
           SizedBox(width: 16.w),
-          
+
           // 天气描述
           Expanded(
             flex: 2,
@@ -356,9 +356,9 @@ class WeatherDetailView extends GetView<WeatherDetailController> {
               textAlign: TextAlign.center,
             ),
           ),
-          
+
           SizedBox(width: 16.w),
-          
+
           // 温度范围
           Text(
             '${daily.minTempC.round()}° / ${daily.maxTempC.round()}°',

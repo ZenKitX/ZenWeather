@@ -14,15 +14,15 @@ class SplashController extends GetxController {
   void _navigateToHome() async {
     // 等待2秒，展示启动页
     await Future.delayed(const Duration(seconds: 2));
-    
+
     // 检查是否首次启动
     bool isFirst = StorageService.isFirstLaunch();
-    
+
     if (isFirst) {
       // 标记已启动过
       await StorageService.setFirstLaunch(false);
     }
-    
+
     // 跳转到首页
     Get.offAllNamed(AppRoutes.home);
   }

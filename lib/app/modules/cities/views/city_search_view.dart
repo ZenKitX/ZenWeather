@@ -7,7 +7,7 @@ import '../controllers/cities_controller.dart';
 
 /// 城市搜索页面
 class CitySearchView extends GetView<CitiesController> {
-  const CitySearchView({Key? key}) : super(key: key);
+  const CitySearchView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class CitySearchView extends GetView<CitiesController> {
                 Icon(
                   Icons.search,
                   size: 80.sp,
-                  color: theme.iconTheme.color?.withOpacity(0.3),
+                  color: theme.iconTheme.color?.withValues(alpha: 0.3),
                 ),
                 SizedBox(height: 24.h),
                 Text(

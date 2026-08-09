@@ -7,10 +7,10 @@ import '../../../data/models/poem_model.dart';
 
 /// 天气详情控制器 - 重构版
 class WeatherDetailController extends GetxController {
-  final weather_kit.WeatherService _weatherService = weather_kit.WeatherService(
+  final weather_kit.WeatherService _weatherService =
+      weather_kit.WeatherService.withWeatherAPI(
     apiKey: const String.fromEnvironment('WEATHER_API_KEY', defaultValue: ''),
   );
-  final poetry_kit.PoetryService _poetryService = poetry_kit.PoetryService();
 
   // 天气数据
   final Rx<WeatherModel?> weather = Rx<WeatherModel?>(null);
@@ -42,20 +42,19 @@ class WeatherDetailController extends GetxController {
 
   /// 初始化节气信息（使用 SolarTermKit）
   void _initSolarTerm() {
-    final now = DateTime.now();
-    final solarTerm = solar_term_kit.SolarTerms.getCurrentSolarTerm(now);
+    final solarTerm = solar_term_kit.SolarTerms.getCurrentSolarTerm();
     currentSolarTerm.value = solarTerm.name;
     isSolarTermDay.value = _isSolarTermDay(solarTerm);
   }
 
   /// 判断是否是节气当天
   bool _isSolarTermDay(solar_term_kit.SolarTerm solarTerm) {
-    final now = DateTime.now();
     final solarTermTime = solar_term_kit.SolarTerms.getSolarTermTime(
-      now.year,
+      DateTime.now().year,
       solarTerm.index,
     );
 
+    final now = DateTime.now();
     return now.year == solarTermTime.year &&
         now.month == solarTermTime.month &&
         now.day == solarTermTime.day;
@@ -96,124 +95,124 @@ class WeatherDetailController extends GetxController {
 
     // 如果是节气当天，优先显示节气诗词
     if (isSolarTermDay.value && currentSolarTerm.value.isNotEmpty) {
-      final poetryKitPoem = _poetryService.getPoem(
+      final poetryKitPoem = poetry_kit.PoetryService.getPoem(
         solarTerm: currentSolarTerm.value,
       );
-      if (poetryKitPoem != null) {
-        poem.value = _convertPoemData(poetryKitPoem);
-        return;
-      }
+      poem.value = _convertPoemData(poetryKitPoem);
+      return;
     }
 
     // 根据天气状况获取诗词
-    final poetryKitPoem = _poetryService.getPoem(
-      weatherCondition: weather.value!.current.condition.text,
+    final poetryKitPoem = poetry_kit.PoetryService.getPoem(
+      weatherCondition: weather.value!.current.conditionText,
     );
 
-    if (poetryKitPoem != null) {
-      poem.value = _convertPoemData(poetryKitPoem);
-    }
+    poem.value = _convertPoemData(poetryKitPoem);
   }
 
   /// 转换 WeatherKit 数据到 ZenWeather 数据模型
-  WeatherModel _convertWeatherData(weather_kit.WeatherData kitData) {
+  WeatherModel _convertWeatherData(weather_kit.Weather kitData) {
     return WeatherModel(
-      location: Location(
-        name: kitData.location.name,
-        region: kitData.location.region,
-        country: kitData.location.country,
-        lat: kitData.location.lat,
-        lon: kitData.location.lon,
-        tzId: 'Asia/Shanghai',
-        localtimeEpoch: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      location: LocationInfo(
+        name: kitData.city.name,
+        region: kitData.city.region,
+        country: kitData.city.country,
+        lat: kitData.city.latitude,
+        lon: kitData.city.longitude,
+        localtime: kitData.currentTime.toIso8601String(),
       ),
-      current: Current(
-        lastUpdatedEpoch: DateTime.now().millisecondsSinceEpoch ~/ 1000,
-        tempC: kitData.current.tempC,
-        tempF: kitData.current.tempC * 9 / 5 + 32,
-        isDay: 1,
-        condition: Condition(
-          text: kitData.current.conditionText,
-          icon: 'sunny',
-          code: 1000,
-        ),
-        windKph: kitData.current.windKph,
-        windDegree: 0,
-        windDir: 'N',
-        pressureMb: 1013.0,
-        precipMm: 0.0,
-        humidity: kitData.current.humidity,
-        cloud: 25,
-        feelslikeC: kitData.current.tempC,
-        feelslikeF: kitData.current.tempC * 9 / 5 + 32,
+      current: CurrentWeather(
+        tempC: kitData.currentTemperature,
+        tempF: kitData.currentTemperature * 9 / 5 + 32,
+        condition: kitData.condition.name,
+        conditionText: _conditionText(kitData.condition),
+        icon: _conditionIcon(kitData.condition),
+        windKph: kitData.windSpeed,
+        windMph: kitData.windSpeed * 0.621371,
+        humidity: kitData.humidity,
+        feelslikeC: kitData.currentTemperature,
+        feelslikeF: kitData.currentTemperature * 9 / 5 + 32,
         visKm: 10.0,
-        uv: kitData.current.uvIndex.toDouble(),
-        gustMph: 0.0,
+        visMiles: 6.2,
+        pressureMb: 1013.0,
+        pressureIn: 29.92,
+        uv: 0,
       ),
-      forecast: Forecast(
-        forecastday: kitData.daily.map((daily) {
-          return Forecastday(
-            date: daily.date,
-            dateEpoch: daily.date.millisecondsSinceEpoch ~/ 1000,
-            day: Day(
-              maxtempC: daily.maxTempC,
-              maxtempF: daily.maxTempC * 9 / 5 + 32,
-              mintempC: daily.minTempC,
-              mintempF: daily.minTempC * 9 / 5 + 32,
-              avgtempC: (daily.maxTempC + daily.minTempC) / 2,
-              avgtempF: (daily.maxTempC + daily.minTempC) / 2 * 9 / 5 + 32,
-              maxwindMph: 0.0,
-              totalprecipMm: 0.0,
-              avghumidity: 60,
-              dailyWillItRain: daily.chanceOfRain > 50,
-              dailyChanceOfRain: daily.chanceOfRain,
-              condition: Condition(
-                text: daily.conditionText,
-                icon: 'sunny',
-                code: 1000,
-              ),
-              uv: 5.0,
-            ),
-            astro: Astro(
-              sunrise: '06:00',
-              sunset: '18:00',
-            ),
-            hour: kitData.hourly
-                .take(24)
-                .map((hourly) => Hour(
-                      timeEpoch: hourly.time.millisecondsSinceEpoch ~/ 1000,
-                      tempC: hourly.tempC,
-                      tempF: hourly.tempC * 9 / 5 + 32,
-                      isDay: hourly.time.hour >= 6 && hourly.time.hour < 18 ? 1 : 0,
-                      condition: Condition(
-                        text: hourly.conditionText,
-                        icon: 'sunny',
-                        code: 1000,
-                      ),
-                      windKph: 10.0,
-                      windDegree: 0,
-                      windDir: 'N',
-                      pressureMb: 1013.0,
-                      precipMm: 0.0,
-                      humidity: 60,
-                      cloud: 25,
-                      feelslikeC: hourly.tempC,
-                      feelslikeF: hourly.tempC * 9 / 5 + 32,
-                      windChillC: hourly.tempC,
-                      windChillF: hourly.tempC * 9 / 5 + 32,
-                      heatIndexC: hourly.tempC,
-                      heatIndexF: hourly.tempC * 9 / 5 + 32,
-                      dewpointC: hourly.tempC - 5,
-                      dewPointF: (hourly.tempC - 5) * 9 / 5 + 32,
-                      willItRain: hourly.chanceOfRain > 50,
-                      chanceOfRain: hourly.chanceOfRain,
-                      visKm: 10.0,
-                    ))
-                .toList(),
-          );
-        }).toList(),
-      ),
+      hourly: kitData.hourlyForecast.take(24).map((hourly) {
+        return HourlyForecast(
+          time: hourly.time.toIso8601String(),
+          tempC: hourly.temperature,
+          tempF: hourly.temperature * 9 / 5 + 32,
+          condition: hourly.condition.name,
+          conditionText: _conditionText(hourly.condition),
+          icon: _conditionIcon(hourly.condition),
+          windKph: hourly.windSpeed,
+          chanceOfRain: hourly.humidity > 70 ? 60 : 10,
+        );
+      }).toList(),
+      daily: kitData.dailyForecast.map((daily) {
+        return DailyForecast(
+          date: daily.date.toIso8601String(),
+          maxTempC: daily.maxTemp,
+          maxTempF: daily.maxTemp * 9 / 5 + 32,
+          minTempC: daily.minTemp,
+          minTempF: daily.minTemp * 9 / 5 + 32,
+          condition: daily.condition.name,
+          conditionText: _conditionText(daily.condition),
+          icon: _conditionIcon(daily.condition),
+          maxWindKph: 0.0,
+          chanceOfRain: daily.uvIndex > 5 ? 20 : 10,
+        );
+      }).toList(),
     );
+  }
+
+  /// 天气状况文本
+  String _conditionText(weather_kit.WeatherCondition condition) {
+    switch (condition) {
+      case weather_kit.WeatherCondition.clear:
+        return '晴';
+      case weather_kit.WeatherCondition.partlyCloudy:
+        return '多云';
+      case weather_kit.WeatherCondition.cloudy:
+        return '阴';
+      case weather_kit.WeatherCondition.rain:
+        return '雨';
+      case weather_kit.WeatherCondition.snow:
+        return '雪';
+      case weather_kit.WeatherCondition.thunderstorm:
+        return '雷雨';
+      case weather_kit.WeatherCondition.fog:
+        return '雾';
+      case weather_kit.WeatherCondition.mist:
+        return '薄雾';
+      case weather_kit.WeatherCondition.unknown:
+        return '未知';
+    }
+  }
+
+  /// 天气图标
+  String _conditionIcon(weather_kit.WeatherCondition condition) {
+    switch (condition) {
+      case weather_kit.WeatherCondition.clear:
+        return '//cdn.weatherapi.com/weather/64x64/day/113.png';
+      case weather_kit.WeatherCondition.partlyCloudy:
+        return '//cdn.weatherapi.com/weather/64x64/day/116.png';
+      case weather_kit.WeatherCondition.cloudy:
+        return '//cdn.weatherapi.com/weather/64x64/day/119.png';
+      case weather_kit.WeatherCondition.rain:
+        return '//cdn.weatherapi.com/weather/64x64/day/302.png';
+      case weather_kit.WeatherCondition.snow:
+        return '//cdn.weatherapi.com/weather/64x64/day/326.png';
+      case weather_kit.WeatherCondition.thunderstorm:
+        return '//cdn.weatherapi.com/weather/64x64/day/200.png';
+      case weather_kit.WeatherCondition.fog:
+        return '//cdn.weatherapi.com/weather/64x64/day/248.png';
+      case weather_kit.WeatherCondition.mist:
+        return '//cdn.weatherapi.com/weather/64x64/day/143.png';
+      case weather_kit.WeatherCondition.unknown:
+        return '//cdn.weatherapi.com/weather/64x64/day/113.png';
+    }
   }
 
   /// 转换 ChinesePoetryKit 数据到 ZenWeather 数据模型
@@ -222,7 +221,7 @@ class WeatherDetailController extends GetxController {
       title: poetryKitPoem.title,
       author: poetryKitPoem.author,
       dynasty: poetryKitPoem.dynasty,
-      content: poetryKitPoem.content.join('\n'),
+      content: poetryKitPoem.content,
       tags: poetryKitPoem.tags,
     );
   }
@@ -239,26 +238,25 @@ class WeatherDetailController extends GetxController {
 
   /// 获取天气描述
   String get weatherDesc {
-    return weather.value?.current.condition.text ?? '未知';
+    return weather.value?.current.conditionText ?? '未知';
   }
 
   /// 获取节气描述
   String get solarTermDescription {
     if (currentSolarTerm.value.isEmpty) return '';
 
-    final solarTerm = solar_term_kit.SolarTerms.getSolarTermByName(
-      currentSolarTerm.value,
-    );
+    final solarTerm =
+        solar_term_kit.SolarTerms.getSolarTermByName(currentSolarTerm.value);
     return solarTerm?.description ?? '';
   }
 
   /// 获取小时预报
-  List<Hour> get hourlyForecast {
-    return weather.value?.forecast.forecastday.firstOrNull?.hour ?? [];
+  List<HourlyForecast> get hourlyForecast {
+    return weather.value?.hourly ?? [];
   }
 
   /// 获取天预报
-  List<Forecastday> get dailyForecast {
-    return weather.value?.forecast.forecastday ?? [];
+  List<DailyForecast> get dailyForecast {
+    return weather.value?.daily ?? [];
   }
 }
